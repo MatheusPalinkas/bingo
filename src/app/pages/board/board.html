@@ -18,6 +18,14 @@
           <button type="button" class="btn btn-outline" (click)="finishGame()">Finalizar</button>
         }
         <a class="btn btn-outline" routerLink="/historico">Histórico</a>
+        <button
+          type="button"
+          class="btn btn-outline theme-toggle"
+          (click)="toggleTheme()"
+          [title]="theme() === 'dark' ? 'Tema claro' : 'Tema escuro'"
+        >
+          {{ theme() === 'dark' ? '☀️ Claro' : '🌙 Escuro' }}
+        </button>
       </div>
     </div>
   </header>

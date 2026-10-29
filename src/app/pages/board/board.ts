@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { BingoService } from '../../services/bingo';
+import { ThemeService } from '../../services/theme';
 import { BingoBall, BingoLetter } from '../../models/game.model';
 
 @Component({
@@ -20,6 +21,13 @@ import { BingoBall, BingoLetter } from '../../models/game.model';
 })
 export class Board {
   private readonly bingo = inject(BingoService);
+  private readonly themeService = inject(ThemeService);
+
+  readonly theme = this.themeService.theme;
+
+  toggleTheme(): void {
+    this.themeService.toggle();
+  }
 
   readonly letters: BingoLetter[] = ['B', 'I', 'N', 'G', 'O'];
 

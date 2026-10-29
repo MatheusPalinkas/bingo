@@ -90,13 +90,13 @@ h2 {
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45);
+    box-shadow: 0 0 0 0 var(--focus-ring);
   }
   70% {
-    box-shadow: 0 0 0 0.5rem rgba(22, 163, 74, 0);
+    box-shadow: 0 0 0 0.5rem transparent;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 
@@ -252,7 +252,7 @@ h2 {
 .toggle:hover,
 .toggle.is-on {
   background: var(--primary);
-  color: #fff;
+  color: var(--on-primary);
 }
 
 .empty-box {
@@ -294,7 +294,7 @@ h2 {
 }
 
 .last-ball.is-current {
-  background: linear-gradient(135deg, var(--primary-soft), #fff);
+  background: linear-gradient(135deg, var(--primary-soft), var(--surface));
   border-color: var(--primary);
   color: var(--primary-dark);
   box-shadow: 0 0 0 3px var(--primary-soft);
@@ -372,8 +372,8 @@ h2 {
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  color: var(--on-primary);
+  box-shadow: 0 6px 16px var(--focus-ring);
 }
 
 .btn-primary:hover {
@@ -413,7 +413,7 @@ h2 {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   font-weight: 900;
   font-size: 1.3rem;
-  color: #fff;
+  color: var(--on-primary);
   letter-spacing: 0.05em;
 }
 
@@ -440,7 +440,7 @@ h2 {
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   font-weight: 900;
   font-size: 1.3rem;
-  color: #fff;
+  color: var(--on-primary);
   letter-spacing: 0.05em;
 }
 
@@ -489,7 +489,7 @@ h2 {
 .ball.is-current {
   background: linear-gradient(135deg, var(--accent), var(--accent-text));
   border-color: var(--accent);
-  color: #fff;
+  color: var(--on-primary);
   box-shadow: 0 0 0 3px var(--accent-soft);
   transform: scale(1.04);
 }

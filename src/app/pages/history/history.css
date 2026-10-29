@@ -81,8 +81,8 @@ h2 {
 
 .btn-primary {
   background: var(--primary);
-  color: #fff;
-  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+  color: var(--on-primary);
+  box-shadow: 0 6px 16px var(--focus-ring);
 }
 
 .btn-primary:hover {
@@ -95,7 +95,7 @@ h2 {
 }
 
 .btn-danger:hover {
-  background: #fbd0d0;
+  background: var(--primary-soft);
 }
 
 /* Cards ----------------------------------------------------------------- */
@@ -184,13 +184,13 @@ h2 {
 
 @keyframes pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45);
+    box-shadow: 0 0 0 0 var(--focus-ring);
   }
   70% {
-    box-shadow: 0 0 0 0.45rem rgba(22, 163, 74, 0);
+    box-shadow: 0 0 0 0.45rem transparent;
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+    box-shadow: 0 0 0 0 transparent;
   }
 }
 
@@ -267,7 +267,7 @@ h2 {
 .order-index {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--on-primary);
   background: linear-gradient(135deg, var(--primary), var(--primary-dark));
   border-radius: 999px;
   min-width: 1.3rem;
