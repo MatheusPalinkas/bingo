@@ -1,7 +1,6 @@
 <div class="page">
   <header class="page-head">
     <div class="head-text">
-      <span class="eyebrow">Painel do sorteio</span>
       <h1>Histórico de partidas</h1>
     </div>
 
@@ -36,7 +35,7 @@
 
             <span class="game-meta">
               <span class="count">{{ game.drawnNumbers.length }} pedras</span>
-              <span class="chevron" [class.open]="isExpanded(game.id)">⌄</span>
+              <span class="chevron" [class.open]="isExpanded(game.id)" aria-hidden="true">⌄</span>
             </span>
           </button>
 
@@ -60,9 +59,18 @@
                 <button type="button" class="btn btn-primary" (click)="reopen(game)">
                   Reabrir partida
                 </button>
-                <button type="button" class="btn btn-danger" (click)="remove(game)">
-                  Remover
-                </button>
+                @if (isPendingDelete(game.id)) {
+                  <button type="button" class="btn btn-danger" (click)="requestRemove(game)">
+                    Confirmar remoção
+                  </button>
+                  <button type="button" class="btn btn-outline" (click)="cancelRemove()">
+                    Cancelar
+                  </button>
+                } @else {
+                  <button type="button" class="btn btn-danger" (click)="requestRemove(game)">
+                    Remover
+                  </button>
+                }
               </div>
             </div>
           }

@@ -1,17 +1,10 @@
 <div class="page">
   <header class="page-head">
     <div class="head-text">
-      <span class="eyebrow">Painel do sorteio</span>
       <h1>Bingo</h1>
     </div>
 
     <div class="head-status">
-      @if (game()) {
-        <span class="badge badge-live"><span class="dot"></span> Sorteio ativo</span>
-      } @else {
-        <span class="badge badge-idle"><span class="dot dot-idle"></span> Sem partida</span>
-      }
-
       <div class="head-actions">
         <button type="button" class="btn btn-primary" (click)="newGame()">Novo jogo</button>
         @if (game()) {
@@ -22,209 +15,160 @@
           type="button"
           class="btn btn-outline theme-toggle"
           (click)="toggleTheme()"
-          [title]="theme() === 'dark' ? 'Tema claro' : 'Tema escuro'"
+          [attr.aria-pressed]="theme() === 'dark'"
+          [attr.aria-label]="theme() === 'dark' ? 'Mudar para tema claro' : 'Mudar para tema escuro'"
         >
-          {{ theme() === 'dark' ? '☀️ Claro' : '🌙 Escuro' }}
+          <span aria-hidden="true">{{ theme() === 'dark' ? '☀️' : '🌙' }}</span>
+          {{ theme() === 'dark' ? 'Claro' : 'Escuro' }}
         </button>
       </div>
     </div>
   </header>
 
   <div class="board-hint">
-    <span>Arraste os cards pela alça ⠿ para reorganizar. Redimensione pelo canto inferior direito.</span>
-    <button type="button" class="toggle" (click)="resetLayout()">Restaurar layout</button>
+    <button type="button" class="toggle" (click)="resetLayout()">Restaurar tamanhos</button>
   </div>
 
-  <!-- Área de cards reordenáveis -->
-  <section class="board-flow">
-    @for (cardId of cardOrder(); track cardId) {
-      @switch (cardId) {
+  <!-- Linha superior: Últimas pedras | Pedra atual -->
+  <section class="top-row">
+    <!-- Últimas pedras -->
+    <div class="card card-last resizable" #lastCard [style]="styleFor('last')">
+      <div class="card-head">
+        <h2>Últimas pedras</h2>
+        <span class="pill">{{ drawnCount() }} pedras</span>
+      </div>
 
-        <!-- Últimas pedras -->
-        @case ('last') {
-          <div
-            class="card card-last resizable"
-            [class.dragging]="isDragging('last')"
-            [style]="styleFor('last')"
-            (dragover)="onDragOver($event)"
-            (drop)="onDrop('last', $event)"
-            (mouseup)="onResizeEnd('last', $any($event.currentTarget))"
-          >
-            <div class="card-head">
-              <span
-                class="drag-handle"
-                draggable="true"
-                (dragstart)="onDragStart('last', $event)"
-                title="Arrastar"
-                >⠿</span
-              >
-              <h2>Últimas pedras</h2>
-              <span class="pill">{{ drawnCount() }} pedras</span>
+      @if (lastBalls().length) {
+        <div class="last-balls">
+          @for (ball of lastBalls(); track ball.number) {
+            <div class="last-ball" [class.is-current]="isCurrent(ball.number)">
+              {{ ball.label }}
             </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-box">
+          <p class="empty">Nenhuma pedra sorteada ainda.</p>
+        </div>
+      }
+    </div>
 
-            @if (lastBalls().length) {
-              <div class="last-balls">
-                @for (ball of lastBalls(); track ball.number) {
-                  <div class="last-ball" [class.is-current]="isCurrent(ball.number)">
-                    {{ ball.label }}
-                  </div>
-                }
-              </div>
-            } @else {
-              <div class="empty-box">
-                <p class="empty">Nenhuma pedra sorteada ainda.</p>
-              </div>
-            }
-          </div>
+    <!-- Pedra atual -->
+    <div class="card card-current resizable" #currentCard [style]="styleFor('current')">
+      <div class="card-head">
+        <h2>Pedra atual</h2>
+        @if (currentBall()) {
+          <span class="pill pill-accent">Sorteada</span>
         }
+      </div>
 
-        <!-- Pedra atual -->
-        @case ('current') {
-          <div
-            class="card card-current resizable"
-            [class.dragging]="isDragging('current')"
-            [style]="styleFor('current')"
-            (dragover)="onDragOver($event)"
-            (drop)="onDrop('current', $event)"
-            (mouseup)="onResizeEnd('current', $any($event.currentTarget))"
-          >
-            <div class="card-head">
-              <span
-                class="drag-handle"
-                draggable="true"
-                (dragstart)="onDragStart('current', $event)"
-                title="Arrastar"
-                >⠿</span
-              >
-              <h2>Pedra atual</h2>
-              @if (currentBall()) {
-                <span class="pill pill-accent">Sorteada</span>
-              }
-            </div>
-
-            <div class="current-box" [class.is-active]="currentBall()">
-              @if (currentBall()) {
-                <span class="current-label">Última pedra sorteada</span>
-                <div class="current-number">{{ currentBall()!.label }}</div>
-                <span class="current-sub">Pronta para ser anunciada</span>
-              } @else {
-                <span class="current-label">Aguardando</span>
-                <div class="current-number current-empty">—</div>
-                <span class="current-sub">Clique numa pedra do painel</span>
-              }
-            </div>
-          </div>
+      <div class="current-box" [class.is-active]="currentBall()">
+        @if (currentBall()) {
+          <span class="current-label">Última pedra sorteada</span>
+          <div class="current-number">{{ currentBall()!.label }}</div>
+          <span class="current-sub">Pronta para ser anunciada</span>
+        } @else {
+          <span class="current-label">Aguardando</span>
+          <div class="current-number current-empty" aria-hidden="true">—</div>
+          <span class="current-sub">Clique numa pedra do painel</span>
         }
+      </div>
+    </div>
+  </section>
 
-        <!-- Painel BINGO -->
-        @case ('panel') {
-          <div
-            class="panel-anchor resizable"
-            #panelAnchor
-            [class.dragging]="isDragging('panel')"
-            [style]="styleFor('panel')"
-            (dragover)="onDragOver($event)"
-            (drop)="onDrop('panel', $event)"
-            (mouseup)="onResizeEnd('panel', $any($event.currentTarget))"
-          >
-            @if (poppedOut()) {
-              <section class="card panel panel-placeholder">
-                <div class="placeholder-box">
-                  <span class="placeholder-icon">🪟</span>
-                  <h2>Painel destacado</h2>
-                  <p>O painel BINGO está aberto em outra janela.</p>
-                  <button type="button" class="btn btn-primary" (click)="closePopOut()">
-                    Trazer de volta
-                  </button>
-                </div>
-              </section>
-            }
+  <!-- Painel BINGO -->
+  <div class="panel-anchor resizable" #panelAnchor [style]="styleFor('panel')">
+    @if (poppedOut()) {
+      <section class="card panel panel-placeholder">
+        <div class="placeholder-box">
+          <span class="placeholder-icon" aria-hidden="true">🪟</span>
+          <h2>Painel destacado</h2>
+          <p>O painel BINGO está aberto em outra janela.</p>
+          <button type="button" class="btn btn-primary" (click)="closePopOut()">
+            Trazer de volta
+          </button>
+        </div>
+      </section>
+    }
 
-            <section class="card panel" #panelContent>
-    <div class="card-head">
-      <span
-        class="drag-handle"
-        draggable="true"
-        (dragstart)="onDragStart('panel', $event)"
-        title="Arrastar"
-        >⠿</span
-      >
-      <h2>Painel B I N G O</h2>
-      <div class="panel-tools">
-        @if (canPopOut) {
+    <section class="card panel" #panelContent>
+      <div class="card-head">
+        <h2>Painel B I N G O</h2>
+        <div class="panel-tools">
+          @if (canPopOut) {
+            <button
+              type="button"
+              class="toggle"
+              [class.is-on]="poppedOut()"
+              [attr.aria-pressed]="poppedOut()"
+              (click)="popOutPanel()"
+            >
+              {{ poppedOut() ? 'Trazer de volta' : 'Destacar janela' }}
+            </button>
+          }
           <button
             type="button"
             class="toggle"
-            [class.is-on]="poppedOut()"
-            (click)="popOutPanel()"
+            [class.is-on]="horizontal()"
+            [attr.aria-pressed]="horizontal()"
+            (click)="toggleOrientation()"
           >
-            {{ poppedOut() ? 'Trazer de volta' : 'Destacar janela' }}
+            {{ horizontal() ? 'Letras no topo' : 'Letras na lateral' }}
           </button>
-        }
-        <button
-          type="button"
-          class="toggle"
-          [class.is-on]="horizontal()"
-          (click)="toggleOrientation()"
-        >
-          {{ horizontal() ? 'Letras no topo' : 'Letras na lateral' }}
-        </button>
-        <span class="pill">{{ drawnCount() }} de 75 sorteadas</span>
-      </div>
-    </div>
-
-    @if (!horizontal()) {
-      <!-- Layout vertical: letras no topo -->
-      <div class="grid">
-        <div class="grid-head">
-          @for (letter of letters; track letter) {
-            <div class="head-cell">{{ letter }}</div>
-          }
+          <span class="pill">{{ drawnCount() }} de 75 sorteadas</span>
         </div>
+      </div>
 
-        @for (row of rows(); track $index) {
-          <div class="grid-row">
-            @for (ball of row; track ball.number) {
-              <button
-                type="button"
-                class="ball"
-                [class.is-drawn]="isDrawn(ball.number)"
-                [class.is-current]="isCurrent(ball.number)"
-                (click)="onBallClick(ball)"
-              >
-                {{ ball.label }}
-              </button>
+      @if (!horizontal()) {
+        <!-- Layout vertical: letras no topo -->
+        <div class="grid">
+          <div class="grid-head">
+            @for (letter of letters; track letter) {
+              <div class="head-cell">{{ letter }}</div>
             }
           </div>
-        }
-      </div>
-    } @else {
-      <!-- Layout horizontal: letras na lateral esquerda -->
-      <div class="grid-h">
-        @for (line of lines(); track line.letter) {
-          <div class="grid-h-row">
-            <div class="side-cell">{{ line.letter }}</div>
-            <div class="grid-h-balls">
-              @for (ball of line.balls; track ball.number) {
+
+          @for (row of rows(); track $index) {
+            <div class="grid-row">
+              @for (ball of row; track ball.number) {
                 <button
                   type="button"
                   class="ball"
                   [class.is-drawn]="isDrawn(ball.number)"
                   [class.is-current]="isCurrent(ball.number)"
+                  [attr.aria-pressed]="isDrawn(ball.number)"
                   (click)="onBallClick(ball)"
                 >
                   {{ ball.label }}
                 </button>
               }
             </div>
-          </div>
-        }
-      </div>
-    }
-            </section>
-          </div>
-        }
+          }
+        </div>
+      } @else {
+        <!-- Layout horizontal: letras na lateral esquerda -->
+        <div class="grid-h">
+          @for (line of lines(); track line.letter) {
+            <div class="grid-h-row">
+              <div class="side-cell">{{ line.letter }}</div>
+              <div class="grid-h-balls">
+                @for (ball of line.balls; track ball.number) {
+                  <button
+                    type="button"
+                    class="ball"
+                    [class.is-drawn]="isDrawn(ball.number)"
+                    [class.is-current]="isCurrent(ball.number)"
+                    [attr.aria-pressed]="isDrawn(ball.number)"
+                    (click)="onBallClick(ball)"
+                  >
+                    {{ ball.label }}
+                  </button>
+                }
+              </div>
+            </div>
+          }
+        </div>
       }
-    }
-  </section>
+    </section>
+  </div>
 </div>

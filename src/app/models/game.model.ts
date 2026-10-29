@@ -10,6 +10,7 @@ export type GameStatus = 'em-andamento' | 'finalizada';
 
 export interface Game {
   id: string;
+  number: number;
   name: string;
   status: GameStatus;
   createdAt: number;

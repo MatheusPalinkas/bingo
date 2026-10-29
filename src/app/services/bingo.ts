@@ -1,7 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { BingoBall, BingoLetter, Game, GameStatus } from '../models/game.model';
+import { BingoBall, BingoLetter, Game } from '../models/game.model';
+import { readStorage, writeStorage, STORAGE_KEYS } from './storage';
 
-const STORAGE_KEY = 'bingo:games:v1';
 const TOTAL_NUMBERS = 75;
 
 const COLUMN_RANGES: { letter: BingoLetter; min: number; max: number }[] = [
@@ -22,25 +22,21 @@ export class BingoService {
     () => this.gamesSignal().find((g) => g.status === 'em-andamento') ?? null,
   );
 
-  readonly allBalls: BingoBall[] = Array.from({ length: TOTAL_NUMBERS }, (_, i) =>
-    this.toBall(i + 1),
-  );
-
   startNewGame(): Game {
-    const games = [...this.gamesSignal()];
-
-    for (const g of games) {
-      if (g.status === 'em-andamento') {
-        g.status = 'finalizada';
-        g.finishedAt = Date.now();
-        g.updatedAt = Date.now();
-      }
-    }
-
     const now = Date.now();
+
+    // Clona cada partida para preservar a imutabilidade do estado.
+    const games = this.gamesSignal().map((g) =>
+      g.status === 'em-andamento'
+        ? { ...g, status: 'finalizada' as const, finishedAt: now, updatedAt: now }
+        : { ...g },
+    );
+
+    const number = this.nextGameNumber(games);
     const newGame: Game = {
       id: this.makeId(),
-      name: `Partida #${this.nextGameNumber(games)}`,
+      number,
+      name: `Partida #${number}`,
       status: 'em-andamento',
       createdAt: now,
       updatedAt: now,
@@ -53,6 +49,7 @@ export class BingoService {
   }
 
   toggleNumber(gameId: string, n: number): void {
+    if (n < 1 || n > TOTAL_NUMBERS) return;
     this.updateGame(gameId, (game) => {
       if (game.status !== 'em-andamento') return game;
       const idx = game.drawnNumbers.indexOf(n);
@@ -76,20 +73,16 @@ export class BingoService {
   }
 
   reopenGame(gameId: string): void {
-    const games = this.gamesSignal().map((g) => ({ ...g }));
-    for (const g of games) {
-      if (g.status === 'em-andamento' && g.id !== gameId) {
-        g.status = 'finalizada';
-        g.finishedAt = Date.now();
-        g.updatedAt = Date.now();
+    const now = Date.now();
+    const games = this.gamesSignal().map((g) => {
+      if (g.id === gameId) {
+        return { ...g, status: 'em-andamento' as const, finishedAt: undefined, updatedAt: now };
       }
-    }
-    const target = games.find((g) => g.id === gameId);
-    if (target) {
-      target.status = 'em-andamento';
-      target.finishedAt = undefined;
-      target.updatedAt = Date.now();
-    }
+      if (g.status === 'em-andamento') {
+        return { ...g, status: 'finalizada' as const, finishedAt: now, updatedAt: now };
+      }
+      return { ...g };
+    });
     this.gamesSignal.set(games);
     this.persist();
   }
@@ -99,48 +92,45 @@ export class BingoService {
     this.persist();
   }
 
-  /** Busca uma partida pelo id. */
-  getGame(gameId: string): Game | undefined {
-    return this.gamesSignal().find((g) => g.id === gameId);
-  }
-
   toBall(n: number): BingoBall {
     const range = COLUMN_RANGES.find((r) => n >= r.min && n <= r.max) ?? COLUMN_RANGES[0];
     return { number: n, letter: range.letter, label: `${range.letter}-${n}` };
   }
 
   private updateGame(gameId: string, mutator: (game: Game) => Game): void {
-    const games = this.gamesSignal().map((g) => (g.id === gameId ? mutator({ ...g, drawnNumbers: [...g.drawnNumbers] }) : g));
+    const games = this.gamesSignal().map((g) =>
+      g.id === gameId ? mutator({ ...g, drawnNumbers: [...g.drawnNumbers] }) : g,
+    );
     this.gamesSignal.set(games);
     this.persist();
   }
 
   private persist(): void {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(this.gamesSignal()));
-    } catch {
-      // Ignora falhas de armazenamento (modo privado, quota, etc.)
-    }
+    writeStorage(STORAGE_KEYS.games, this.gamesSignal());
   }
 
   private load(): Game[] {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return [];
-      const parsed = JSON.parse(raw) as Game[];
-      if (!Array.isArray(parsed)) return [];
-      return parsed;
-    } catch {
-      return [];
-    }
+    const parsed = readStorage<unknown>(STORAGE_KEYS.games, []);
+    if (!Array.isArray(parsed)) return [];
+    // Migração: garante o campo `number` em dados antigos.
+    return parsed
+      .filter((g): g is Game => !!g && typeof g === 'object' && 'id' in g)
+      .map((g, i) => ({
+        ...(g as Game),
+        number: (g as Game).number ?? this.extractNumber((g as Game).name) ?? i + 1,
+        drawnNumbers: Array.isArray((g as Game).drawnNumbers) ? (g as Game).drawnNumbers : [],
+      }));
   }
 
   private nextGameNumber(games: Game[]): number {
-    const numbers = games
-      .map((g) => Number(g.name.replace(/\D/g, '')))
-      .filter((n) => !Number.isNaN(n));
-    const max = numbers.length ? Math.max(...numbers) : 0;
+    const max = games.reduce((m, g) => Math.max(m, g.number ?? 0), 0);
     return max + 1;
+  }
+
+  private extractNumber(name: string | undefined): number | null {
+    if (!name) return null;
+    const match = name.match(/\d+/);
+    return match ? Number(match[0]) : null;
   }
 
   private makeId(): string {
@@ -148,9 +138,5 @@ export class BingoService {
       return crypto.randomUUID();
     }
     return `g-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-  }
-
-  get columnRanges() {
-    return COLUMN_RANGES;
   }
 }

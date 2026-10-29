@@ -19,6 +19,9 @@ export class History {
   /** Id da partida expandida no momento */
   readonly expandedId = signal<string | null>(null);
 
+  /** Id da partida com remoção pendente de confirmação. */
+  readonly pendingDeleteId = signal<string | null>(null);
+
   readonly totalGames = computed(() => this.games().length);
 
   toggleExpand(id: string): void {
@@ -39,11 +42,22 @@ export class History {
     this.router.navigate(['/']);
   }
 
-  remove(game: Game): void {
-    const ok = confirm(`Remover "${game.name}" do histórico?`);
-    if (ok) {
+  /** Primeiro clique arma a confirmação; segundo clique remove. */
+  requestRemove(game: Game): void {
+    if (this.pendingDeleteId() === game.id) {
       this.bingo.deleteGame(game.id);
+      this.pendingDeleteId.set(null);
+    } else {
+      this.pendingDeleteId.set(game.id);
     }
+  }
+
+  cancelRemove(): void {
+    this.pendingDeleteId.set(null);
+  }
+
+  isPendingDelete(id: string): boolean {
+    return this.pendingDeleteId() === id;
   }
 
   statusLabel(game: Game): string {

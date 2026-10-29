@@ -1,8 +1,7 @@
 import { Injectable, signal } from '@angular/core';
+import { readStorage, writeStorage, STORAGE_KEYS } from './storage';
 
 export type Theme = 'light' | 'dark';
-
-const STORAGE_KEY = 'bingo:theme:v1';
 
 @Injectable({ providedIn: 'root' })
 export class ThemeService {
@@ -19,7 +18,7 @@ export class ThemeService {
   set(theme: Theme): void {
     this.theme.set(theme);
     this.apply(theme);
-    this.persist(theme);
+    writeStorage(STORAGE_KEYS.theme, theme);
   }
 
   private apply(theme: Theme): void {
@@ -29,24 +28,14 @@ export class ThemeService {
   }
 
   private load(): Theme {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'light' || saved === 'dark') return saved;
-    } catch {
-      // ignora
-    }
-    // Usa a preferência do sistema como padrão.
+    // Nota: em SSR/prerender não há window; o tema inicial será 'light' e
+    // é reconciliado no cliente, podendo causar um breve flash.
+    const saved = readStorage<Theme | null>(STORAGE_KEYS.theme, null);
+    if (saved === 'light' || saved === 'dark') return saved;
+
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     }
     return 'light';
-  }
-
-  private persist(theme: Theme): void {
-    try {
-      localStorage.setItem(STORAGE_KEY, theme);
-    } catch {
-      // ignora
-    }
   }
 }

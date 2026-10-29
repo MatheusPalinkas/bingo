@@ -98,6 +98,16 @@ h2 {
   background: var(--primary-soft);
 }
 
+.btn-outline {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.btn-outline:hover {
+  background: var(--surface-muted);
+}
+
 /* Cards ----------------------------------------------------------------- */
 .card {
   background: var(--surface);

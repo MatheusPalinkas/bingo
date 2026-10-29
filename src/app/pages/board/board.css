@@ -104,7 +104,7 @@ h2 {
 .board-hint {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 1rem;
   flex-wrap: wrap;
   font-size: 0.85rem;
@@ -112,56 +112,39 @@ h2 {
   padding: 0.5rem 0.25rem;
 }
 
-/* Fluxo de cards reordenáveis ------------------------------------------- */
-.board-flow {
-  display: flex;
-  flex-wrap: wrap;
+/* Linha superior: Últimas pedras | Pedra atual -------------------------- */
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: clamp(1rem, 2.2vw, 1.75rem);
-  align-items: flex-start;
+  align-items: start;
+  margin-bottom: clamp(1rem, 2.2vw, 1.75rem);
 }
 
-/* Cada card ocupa uma faixa; o painel é mais largo por padrão. */
-.board-flow > .card-last,
-.board-flow > .card-current {
-  flex: 1 1 320px;
-  min-width: 280px;
+.panel-anchor {
+  display: block;
 }
 
-.board-flow > .panel-anchor {
-  flex: 2 1 100%;
-  min-width: 320px;
+.panel-anchor.resizable > .panel {
+  height: 100%;
 }
 
-/* Redimensionamento */
+/* Redimensionamento pelo canto inferior direito */
 .resizable {
   resize: both;
   overflow: auto;
+  max-width: 100%;
 }
 
 .resizable.card-last,
 .resizable.card-current {
-  min-height: 12rem;
+  min-width: 220px;
+  min-height: 10rem;
 }
 
-/* Alça de arraste */
-.drag-handle {
-  cursor: grab;
-  user-select: none;
-  font-size: 1.2rem;
-  line-height: 1;
-  color: var(--text-soft);
-  padding: 0 0.35rem 0 0;
-  margin-right: 0.15rem;
-}
-
-.drag-handle:active {
-  cursor: grabbing;
-}
-
-.dragging {
-  opacity: 0.55;
-  outline: 2px dashed var(--primary);
-  outline-offset: 3px;
+.resizable.panel-anchor {
+  min-width: 300px;
+  min-height: 16rem;
 }
 
 /* Cards ----------------------------------------------------------------- */
@@ -201,14 +184,6 @@ h2 {
   color: var(--accent-text);
   background: var(--accent-soft);
   border-color: transparent;
-}
-
-.panel-anchor {
-  display: block;
-}
-
-.panel-anchor.resizable > .panel {
-  height: 100%;
 }
 
 .panel-placeholder .placeholder-box {
@@ -496,10 +471,8 @@ h2 {
 
 /* Responsivo ------------------------------------------------------------ */
 @media (max-width: 760px) {
-  .board-flow > .card-last,
-  .board-flow > .card-current,
-  .board-flow > .panel-anchor {
-    flex: 1 1 100%;
+  .top-row {
+    grid-template-columns: 1fr;
   }
 
   .head-status {
