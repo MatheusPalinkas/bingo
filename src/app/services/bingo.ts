@@ -18,6 +18,18 @@ export class BingoService {
 
   readonly games = this.gamesSignal.asReadonly();
 
+  constructor() {
+    // Mantém as janelas (ex.: painel destacado) sincronizadas: quando outra
+    // janela grava no localStorage, recarregamos o estado aqui.
+    if (typeof window !== 'undefined') {
+      window.addEventListener('storage', (e) => {
+        if (e.key === STORAGE_KEYS.games) {
+          this.gamesSignal.set(this.load());
+        }
+      });
+    }
+  }
+
   readonly currentGame = computed(
     () => this.gamesSignal().find((g) => g.status === 'em-andamento') ?? null,
   );

@@ -1,3 +1,36 @@
+@if (panelMode()) {
+  <!-- Modo painel destacado: somente o painel BINGO, em tela cheia. -->
+  <div class="page panel-only">
+    <section class="card panel">
+      <div class="card-head">
+        <h2>Painel B I N G O</h2>
+        <span class="pill">{{ drawnCount() }} de 75 sorteadas</span>
+      </div>
+
+      <div class="grid-h">
+        @for (line of lines(); track line.letter) {
+          <div class="grid-h-row">
+            <div class="side-cell">{{ line.letter }}</div>
+            <div class="grid-h-balls">
+              @for (ball of line.balls; track ball.number) {
+                <button
+                  type="button"
+                  class="ball"
+                  [class.is-drawn]="isDrawn(ball.number)"
+                  [class.is-current]="isCurrent(ball.number)"
+                  [attr.aria-pressed]="isDrawn(ball.number)"
+                  (click)="onBallClick(ball)"
+                >
+                  {{ ball.label }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  </div>
+} @else {
 <div class="page" [class.is-popped]="poppedOut()">
   <header class="page-head">
     <div class="head-text">
@@ -123,3 +156,4 @@
     </section>
   </div>
 </div>
+}

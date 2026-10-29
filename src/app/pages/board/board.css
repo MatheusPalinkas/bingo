@@ -441,3 +441,13 @@ h2 {
     align-items: flex-start;
   }
 }
+
+/* Modo painel destacado (janela secundária do Electron) ----------------- */
+.page.panel-only {
+  padding: clamp(0.75rem, 2vw, 1.5rem);
+  min-height: 100vh;
+}
+
+.page.panel-only .panel {
+  min-height: calc(100vh - clamp(1.5rem, 4vw, 3rem));
+}

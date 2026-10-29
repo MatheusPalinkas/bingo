@@ -13,6 +13,20 @@ import { BingoService } from '../../services/bingo';
 import { ThemeService } from '../../services/theme';
 import { BingoBall, BingoLetter } from '../../models/game.model';
 
+/** API exposta pelo preload do Electron (quando rodando no desktop). */
+interface ElectronAPI {
+  isElectron: boolean;
+  openPanelWindow(): Promise<void>;
+  closePanelWindow(): Promise<void>;
+  onPanelClosed(callback: () => void): () => void;
+}
+
+declare global {
+  interface Window {
+    electronAPI?: ElectronAPI;
+  }
+}
+
 @Component({
   selector: 'app-board',
   imports: [RouterLink],
@@ -28,13 +42,17 @@ export class Board implements OnDestroy {
 
   readonly letters: BingoLetter[] = ['B', 'I', 'N', 'G', 'O'];
 
-  // ----- Pop-out (Document Picture-in-Picture) -------------------------
+  // ----- Pop-out (painel destacado) ------------------------------------
   readonly panelContent = viewChild<ElementRef<HTMLElement>>('panelContent');
   readonly panelAnchor = viewChild<ElementRef<HTMLElement>>('panelAnchor');
   readonly poppedOut = signal(false);
 
+  /** true quando esta janela é o painel destacado (modo somente-painel). */
+  readonly panelMode = signal(this.readPanelMode());
+
   private pipWindow: Window | null = null;
   private pipCloseHandler: (() => void) | null = null;
+  private electronPanelCleanup: (() => void) | null = null;
 
   readonly game = this.bingo.currentGame;
 
@@ -66,6 +84,16 @@ export class Board implements OnDestroy {
 
   ngOnDestroy(): void {
     this.teardownPip();
+    this.electronPanelCleanup?.();
+  }
+
+  private readPanelMode(): boolean {
+    if (typeof window === 'undefined') return false;
+    try {
+      return new URLSearchParams(window.location.search).get('mode') === 'panel';
+    } catch {
+      return false;
+    }
   }
 
   // ----- Domínio do bingo ----------------------------------------------
@@ -96,8 +124,13 @@ export class Board implements OnDestroy {
   }
 
   // ----- Pop-out -------------------------------------------------------
+  private get electron(): ElectronAPI | undefined {
+    return typeof window !== 'undefined' ? window.electronAPI : undefined;
+  }
+
   get canPopOut(): boolean {
-    return typeof window !== 'undefined' && 'documentPictureInPicture' in window;
+    if (typeof window === 'undefined') return false;
+    return !!this.electron || 'documentPictureInPicture' in window;
   }
 
   async popOutPanel(): Promise<void> {
@@ -106,10 +139,24 @@ export class Board implements OnDestroy {
       return;
     }
 
+    // No Electron, abrimos uma segunda janela nativa (o PiP do navegador não
+    // funciona de forma confiável aqui).
+    if (this.electron) {
+      await this.electron.openPanelWindow();
+      this.poppedOut.set(true);
+      // Quando a janela do painel for fechada, volta ao estado normal.
+      this.electronPanelCleanup = this.electron.onPanelClosed(() => {
+        this.poppedOut.set(false);
+        this.electronPanelCleanup?.();
+        this.electronPanelCleanup = null;
+      });
+      return;
+    }
+
     const content = this.panelContent()?.nativeElement;
     if (!content) return;
 
-    if (!this.canPopOut) {
+    if (!('documentPictureInPicture' in window)) {
       alert(
         'Seu navegador não suporta destacar o painel em janela flutuante. Use o Chrome/Edge mais recente.',
       );
@@ -139,6 +186,13 @@ export class Board implements OnDestroy {
   }
 
   closePopOut(): void {
+    if (this.electron) {
+      this.electron.closePanelWindow();
+      this.poppedOut.set(false);
+      this.electronPanelCleanup?.();
+      this.electronPanelCleanup = null;
+      return;
+    }
     this.pipWindow?.close();
     this.restorePanel();
   }
