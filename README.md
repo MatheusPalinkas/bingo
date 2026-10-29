@@ -1,59 +1,105 @@
-# AppBingo
+# 🎱 Bingo
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.28.
+Aplicação web para conduzir sorteios de bingo (75 bolas, padrão B·I·N·G·O). Marque as pedras sorteadas num painel visual, acompanhe a última pedra em destaque e consulte o histórico de partidas. Ideal para projetar numa tela durante o jogo. 📺
 
-## Development server
+Construída com Angular 21 (standalone components, signals e controle de fluxo `@if`/`@for`), sem backend: todo o estado é persistido no `localStorage` do navegador.
 
-To start a local development server, run:
+🔗 **Acesse a versão publicada:** https://matheuspalinkas.github.io/bingo/
 
-```bash
-ng serve
+## ✨ Funcionalidades
+
+- 🔢 **Painel B·I·N·G·O** com as 75 pedras organizadas por letra (letras na lateral esquerda). Clique numa pedra para marcá-la ou desmarcá-la.
+- 🎯 **Pedra atual** em destaque, mostrando a última bola sorteada.
+- 🕔 **Últimas pedras**: as 5 bolas mais recentes, com a atual destacada.
+- 🎮 **Gerenciamento de partidas**: iniciar novo jogo, finalizar, reabrir e remover. Só existe uma partida em andamento por vez.
+- 📜 **Histórico**: lista todas as partidas com data, status e as pedras na ordem em que foram sorteadas. Permite reabrir ou remover (com confirmação em dois passos).
+- 🪟 **Destacar painel em outra janela** (Document Picture-in-Picture): abre o painel numa janela flutuante sempre-visível. Enquanto destacado, a tela principal esconde o painel e amplia a "Pedra atual". Requer navegador compatível (Chrome/Edge recentes).
+- 🌗 **Tema claro/escuro**: alternância manual com persistência; usa a preferência do sistema como padrão inicial.
+- 💾 **Persistência local**: partidas e tema ficam salvos no `localStorage`.
+
+## 📁 Estrutura do projeto
+
+```
+src/
+├── app/
+│   ├── app.ts / app.html / app.config.ts / app.routes.ts
+│   ├── models/
+│   │   └── game.model.ts          # Tipos Game, BingoBall, BingoLetter, GameStatus
+│   ├── pages/
+│   │   ├── board/                 # Painel principal do sorteio (rota "/")
+│   │   └── history/               # Histórico de partidas (rota "/historico")
+│   └── services/
+│       ├── bingo.ts               # Estado das partidas e regras do jogo
+│       ├── theme.ts               # Tema claro/escuro
+│       └── storage.ts             # Helpers de localStorage + STORAGE_KEYS
+├── styles.css                     # Tema global (paleta de azul, claro/escuro)
+├── index.html
+└── main.ts
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+### 🧭 Rotas
 
-## Code scaffolding
+| Caminho       | Página            |
+| ------------- | ----------------- |
+| `/`           | Painel do sorteio |
+| `/historico`  | Histórico         |
+| `**`          | Redireciona para `/` |
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### 🗃️ Camada de dados
 
-```bash
-ng generate component component-name
-```
+- `BingoService` (`providedIn: 'root'`) mantém as partidas num signal, expõe `currentGame` como `computed` e persiste cada alteração. As operações (`startNewGame`, `toggleNumber`, `finishGame`, `reopenGame`, `deleteGame`) trabalham de forma imutável.
+- `ThemeService` controla o atributo `data-theme` no `<html>` e persiste a escolha.
+- `storage.ts` centraliza leitura/escrita no `localStorage` (`readStorage`/`writeStorage`/`removeStorage`) e as chaves em `STORAGE_KEYS`.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Chaves de armazenamento usadas:
 
-```bash
-ng generate --help
-```
+- `bingo:games:v1` — partidas
+- `bingo:theme:v1` — tema
 
-## Building
+## 📋 Pré-requisitos
 
-To build the project run:
+- Node.js (versão compatível com Angular 21)
+- npm 11+
 
-```bash
-ng build
-```
+## 🚀 Como rodar
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+Instale as dependências:
 
 ```bash
-ng test
+npm install
 ```
 
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
+🧑‍💻 Servidor de desenvolvimento (abre em `http://localhost:4200/` e recarrega ao salvar):
 
 ```bash
-ng e2e
+npm start
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+📦 Build de produção (artefatos em `dist/`):
 
-## Additional Resources
+```bash
+npm run build
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+👀 Build em modo watch (desenvolvimento):
+
+```bash
+npm run watch
+```
+
+## 🧪 Testes
+
+Testes unitários com [Vitest](https://vitest.dev/):
+
+```bash
+npm test
+```
+
+## ⚠️ Notas de compatibilidade
+
+- 🪟 O recurso de **destacar o painel em outra janela** depende da Document Picture-in-Picture API, disponível em Chrome/Edge recentes. Em navegadores sem suporte, o botão fica oculto.
+- 🎨 A aplicação usa apenas uma paleta de azul, com variantes para os temas claro e escuro definidas via variáveis CSS em `src/styles.css`.
+
+## 📄 Licença
+
+Projeto pessoal, sem licença definida.
