@@ -7,7 +7,6 @@
 export const STORAGE_KEYS = {
   games: 'bingo:games:v1',
   theme: 'bingo:theme:v1',
-  cardSizes: 'bingo:cardSizes:v3',
 } as const;
 
 export type StorageKey = (typeof STORAGE_KEYS)[keyof typeof STORAGE_KEYS];

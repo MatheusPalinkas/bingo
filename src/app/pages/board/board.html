@@ -1,4 +1,4 @@
-<div class="page">
+<div class="page" [class.is-popped]="poppedOut()">
   <header class="page-head">
     <div class="head-text">
       <h1>Bingo</h1>
@@ -9,6 +9,11 @@
         <button type="button" class="btn btn-primary" (click)="newGame()">Novo jogo</button>
         @if (game()) {
           <button type="button" class="btn btn-outline" (click)="finishGame()">Finalizar</button>
+        }
+        @if (poppedOut()) {
+          <button type="button" class="btn btn-outline" (click)="closePopOut()">
+            Trazer painel de volta
+          </button>
         }
         <a class="btn btn-outline" routerLink="/historico">Histórico</a>
         <button
@@ -25,14 +30,10 @@
     </div>
   </header>
 
-  <div class="board-hint">
-    <button type="button" class="toggle" (click)="resetLayout()">Restaurar tamanhos</button>
-  </div>
-
   <!-- Linha superior: Últimas pedras | Pedra atual -->
   <section class="top-row">
     <!-- Últimas pedras -->
-    <div class="card card-last resizable" #lastCard [style]="styleFor('last')">
+    <div class="card card-last">
       <div class="card-head">
         <h2>Últimas pedras</h2>
         <span class="pill">{{ drawnCount() }} pedras</span>
@@ -54,7 +55,7 @@
     </div>
 
     <!-- Pedra atual -->
-    <div class="card card-current resizable" #currentCard [style]="styleFor('current')">
+    <div class="card card-current">
       <div class="card-head">
         <h2>Pedra atual</h2>
         @if (currentBall()) {
@@ -77,20 +78,7 @@
   </section>
 
   <!-- Painel BINGO -->
-  <div class="panel-anchor resizable" #panelAnchor [style]="styleFor('panel')">
-    @if (poppedOut()) {
-      <section class="card panel panel-placeholder">
-        <div class="placeholder-box">
-          <span class="placeholder-icon" aria-hidden="true">🪟</span>
-          <h2>Painel destacado</h2>
-          <p>O painel BINGO está aberto em outra janela.</p>
-          <button type="button" class="btn btn-primary" (click)="closePopOut()">
-            Trazer de volta
-          </button>
-        </div>
-      </section>
-    }
-
+  <div class="panel-anchor" #panelAnchor>
     <section class="card panel" #panelContent>
       <div class="card-head">
         <h2>Painel B I N G O</h2>
@@ -106,31 +94,17 @@
               {{ poppedOut() ? 'Trazer de volta' : 'Destacar janela' }}
             </button>
           }
-          <button
-            type="button"
-            class="toggle"
-            [class.is-on]="horizontal()"
-            [attr.aria-pressed]="horizontal()"
-            (click)="toggleOrientation()"
-          >
-            {{ horizontal() ? 'Letras no topo' : 'Letras na lateral' }}
-          </button>
           <span class="pill">{{ drawnCount() }} de 75 sorteadas</span>
         </div>
       </div>
 
-      @if (!horizontal()) {
-        <!-- Layout vertical: letras no topo -->
-        <div class="grid">
-          <div class="grid-head">
-            @for (letter of letters; track letter) {
-              <div class="head-cell">{{ letter }}</div>
-            }
-          </div>
-
-          @for (row of rows(); track $index) {
-            <div class="grid-row">
-              @for (ball of row; track ball.number) {
+      <!-- Painel: letras na lateral esquerda -->
+      <div class="grid-h">
+        @for (line of lines(); track line.letter) {
+          <div class="grid-h-row">
+            <div class="side-cell">{{ line.letter }}</div>
+            <div class="grid-h-balls">
+              @for (ball of line.balls; track ball.number) {
                 <button
                   type="button"
                   class="ball"
@@ -143,32 +117,9 @@
                 </button>
               }
             </div>
-          }
-        </div>
-      } @else {
-        <!-- Layout horizontal: letras na lateral esquerda -->
-        <div class="grid-h">
-          @for (line of lines(); track line.letter) {
-            <div class="grid-h-row">
-              <div class="side-cell">{{ line.letter }}</div>
-              <div class="grid-h-balls">
-                @for (ball of line.balls; track ball.number) {
-                  <button
-                    type="button"
-                    class="ball"
-                    [class.is-drawn]="isDrawn(ball.number)"
-                    [class.is-current]="isCurrent(ball.number)"
-                    [attr.aria-pressed]="isDrawn(ball.number)"
-                    (click)="onBallClick(ball)"
-                  >
-                    {{ ball.label }}
-                  </button>
-                }
-              </div>
-            </div>
-          }
-        </div>
-      }
+          </div>
+        }
+      </div>
     </section>
   </div>
 </div>

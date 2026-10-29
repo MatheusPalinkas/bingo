@@ -100,18 +100,6 @@ h2 {
   }
 }
 
-/* Dica de uso ----------------------------------------------------------- */
-.board-hint {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 1rem;
-  flex-wrap: wrap;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  padding: 0.5rem 0.25rem;
-}
-
 /* Linha superior: Últimas pedras | Pedra atual -------------------------- */
 .top-row {
   display: grid;
@@ -123,28 +111,6 @@ h2 {
 
 .panel-anchor {
   display: block;
-}
-
-.panel-anchor.resizable > .panel {
-  height: 100%;
-}
-
-/* Redimensionamento pelo canto inferior direito */
-.resizable {
-  resize: both;
-  overflow: auto;
-  max-width: 100%;
-}
-
-.resizable.card-last,
-.resizable.card-current {
-  min-width: 220px;
-  min-height: 10rem;
-}
-
-.resizable.panel-anchor {
-  min-width: 300px;
-  min-height: 16rem;
 }
 
 /* Cards ----------------------------------------------------------------- */
@@ -184,25 +150,6 @@ h2 {
   color: var(--accent-text);
   background: var(--accent-soft);
   border-color: transparent;
-}
-
-.panel-placeholder .placeholder-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
-  text-align: center;
-  padding: clamp(2rem, 6vw, 4rem);
-}
-
-.placeholder-icon {
-  font-size: 2.5rem;
-}
-
-.panel-placeholder p {
-  color: var(--text-muted);
-  margin: 0;
 }
 
 .panel-tools {
@@ -365,34 +312,7 @@ h2 {
   background: var(--surface-muted);
 }
 
-/* Painel BINGO ---------------------------------------------------------- */
-.grid {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.grid-head,
-.grid-row {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.5rem;
-}
-
-.head-cell {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.6rem;
-  border-radius: 10px;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  font-weight: 900;
-  font-size: 1.3rem;
-  color: var(--on-primary);
-  letter-spacing: 0.05em;
-}
-
-/* Painel horizontal: letras na lateral ---------------------------------- */
+/* Painel BINGO: letras na lateral --------------------------------------- */
 .grid-h {
   display: flex;
   flex-direction: column;
@@ -467,6 +387,48 @@ h2 {
   color: var(--on-primary);
   box-shadow: 0 0 0 3px var(--accent-soft);
   transform: scale(1.04);
+}
+
+/* Painel destacado em outra janela -------------------------------------- */
+.page.is-popped .panel-anchor {
+  display: none;
+}
+
+/* "Pedra atual" ocupa toda a largura e cresce. */
+.page.is-popped .top-row {
+  grid-template-columns: 1fr;
+}
+
+/* "Últimas pedras" acima de "Pedra atual". */
+.page.is-popped .card-last {
+  order: 0;
+}
+
+/* Limita o tamanho das bolas para o card não ficar alto. */
+.page.is-popped .card-last .last-balls {
+  grid-auto-rows: min-content;
+  align-content: start;
+}
+
+.page.is-popped .card-last .last-ball {
+  aspect-ratio: auto;
+  min-height: 3.25rem;
+  padding: 0.75rem 0.25rem;
+  border-radius: 999px;
+}
+
+.page.is-popped .card-current {
+  order: 1;
+  min-height: clamp(16rem, 36vh, 26rem);
+}
+
+.page.is-popped .card-current .current-number {
+  font-size: clamp(5rem, 16vw, 11rem);
+}
+
+.page.is-popped .card-current .current-label,
+.page.is-popped .card-current .current-sub {
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
 }
 
 /* Responsivo ------------------------------------------------------------ */
