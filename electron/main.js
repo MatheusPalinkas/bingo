@@ -8,6 +8,7 @@ const DEV_SERVER_URL = process.env['ELECTRON_DEV_URL'] || 'http://localhost:4200
 // Caminho do index.html gerado pelo builder @angular/build:application.
 const INDEX_HTML = path.join(__dirname, '..', 'dist', 'app-bingo', 'browser', 'index.html');
 const PRELOAD = path.join(__dirname, 'preload.js');
+const ICON = path.join(__dirname, '..', 'build', 'icon.ico');
 
 let mainWindow = null;
 let panelWindow = null;
@@ -28,6 +29,7 @@ function createMainWindow() {
     height: 800,
     show: false,
     autoHideMenuBar: true,
+    icon: ICON,
     webPreferences: {
       preload: PRELOAD,
       contextIsolation: true,
@@ -55,6 +57,7 @@ function openPanelWindow() {
     show: false,
     autoHideMenuBar: true,
     title: 'Painel BINGO',
+    icon: ICON,
     parent: mainWindow ?? undefined,
     webPreferences: {
       preload: PRELOAD,
