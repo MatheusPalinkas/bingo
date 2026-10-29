@@ -1,0 +1,420 @@
+:host {
+  display: block;
+}
+
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: clamp(1.25rem, 3vw, 2.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(1rem, 2.2vw, 1.75rem);
+}
+
+/* Cabeçalho ------------------------------------------------------------- */
+.page-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--text-soft);
+}
+
+h1 {
+  font-size: clamp(2rem, 4vw, 2.75rem);
+  font-weight: 800;
+  margin-top: 0.15rem;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.head-status {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.head-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Badges ---------------------------------------------------------------- */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+}
+
+.badge-live {
+  color: var(--accent-text);
+}
+
+.dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 0 var(--accent-soft);
+  animation: pulse 1.8s ease-out infinite;
+}
+
+.dot-idle {
+  background: var(--text-soft);
+  animation: none;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0.45);
+  }
+  70% {
+    box-shadow: 0 0 0 0.5rem rgba(22, 163, 74, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(22, 163, 74, 0);
+  }
+}
+
+/* Linha superior -------------------------------------------------------- */
+.top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(1rem, 2.2vw, 1.75rem);
+  align-items: stretch;
+}
+
+/* Cards ----------------------------------------------------------------- */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: clamp(1.1rem, 2vw, 1.75rem);
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.pill {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.pill-accent {
+  color: var(--accent-text);
+  background: var(--accent-soft);
+  border-color: transparent;
+}
+
+.panel-tools {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.toggle {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+  background: var(--primary-soft);
+  border: 1px solid transparent;
+  padding: 0.4rem 0.9rem;
+  border-radius: 999px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.toggle:hover,
+.toggle.is-on {
+  background: var(--primary);
+  color: #fff;
+}
+
+.empty-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 7rem;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+}
+
+.empty {
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* Últimas pedras -------------------------------------------------------- */
+.card-last .last-balls {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.6rem;
+  align-content: center;
+}
+
+.last-ball {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: var(--surface-muted);
+  border: 1px solid var(--border);
+  font-size: clamp(0.85rem, 1.4vw, 1.25rem);
+  font-weight: 800;
+  color: var(--text);
+}
+
+.last-ball.is-current {
+  background: linear-gradient(135deg, var(--primary-soft), #fff);
+  border-color: var(--primary);
+  color: var(--primary-dark);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+}
+
+/* Pedra atual ----------------------------------------------------------- */
+.card-current {
+  background: linear-gradient(160deg, var(--surface), var(--surface-muted));
+}
+
+.current-box {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  text-align: center;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.current-box.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-soft);
+}
+
+.current-label,
+.current-sub {
+  color: var(--text-muted);
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.current-number {
+  font-size: clamp(3.5rem, 9vw, 6.5rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  color: var(--text);
+}
+
+.current-box.is-active .current-number {
+  background: linear-gradient(135deg, var(--accent-text), var(--accent));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.current-empty {
+  color: var(--text-soft);
+}
+
+/* Botões ---------------------------------------------------------------- */
+.btn {
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.7rem 1.25rem;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 700;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: transform 0.05s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.25);
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark);
+}
+
+.btn-outline {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--border-strong);
+}
+
+.btn-outline:hover {
+  background: var(--surface-muted);
+}
+
+/* Painel BINGO ---------------------------------------------------------- */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.grid-head,
+.grid-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.5rem;
+}
+
+.head-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+/* Painel horizontal: letras na lateral ---------------------------------- */
+.grid-h {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.grid-h-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.side-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  font-weight: 900;
+  font-size: 1.3rem;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+
+.grid-h-balls {
+  display: grid;
+  grid-template-columns: repeat(15, 1fr);
+  gap: 0.4rem;
+}
+
+.grid-h-balls .ball {
+  padding: 0.6rem 0.15rem;
+  font-size: clamp(0.7rem, 1.1vw, 1rem);
+  border-radius: 10px;
+}
+
+.ball {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 0.25rem;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  font-size: clamp(0.95rem, 1.5vw, 1.35rem);
+  font-weight: 800;
+  color: var(--text);
+  transition: transform 0.05s ease, background 0.12s ease, border-color 0.12s ease,
+    color 0.12s ease;
+}
+
+.ball:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-muted);
+}
+
+.ball:active {
+  transform: scale(0.96);
+}
+
+.ball.is-drawn {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--accent-text);
+}
+
+.ball.is-current {
+  background: linear-gradient(135deg, var(--accent), var(--accent-text));
+  border-color: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 3px var(--accent-soft);
+  transform: scale(1.04);
+}
+
+/* Responsivo ------------------------------------------------------------ */
+@media (max-width: 760px) {
+  .top-row {
+    grid-template-columns: 1fr;
+  }
+
+  .head-status {
+    align-items: flex-start;
+  }
+}

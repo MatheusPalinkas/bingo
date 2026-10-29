@@ -1,1 +1,70 @@
-/* You can add global styles to this file, and also import other style files */
+/* ==========================================================================
+   Tema global — Bingo (claro, alto contraste para projetor)
+   ========================================================================== */
+
+:root {
+  /* Cores base */
+  --bg: #eef1f6;
+  --surface: #ffffff;
+  --surface-muted: #f4f6fa;
+  --border: #e2e6ee;
+  --border-strong: #cdd4e0;
+
+  /* Texto */
+  --text: #0f1729;
+  --text-muted: #5b6577;
+  --text-soft: #8a93a6;
+
+  /* Marca / destaques */
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-soft: #dbe6ff;
+
+  --accent: #16a34a;
+  --accent-soft: #d7f5e3;
+  --accent-text: #0f8a43;
+
+  --danger: #dc2626;
+  --danger-soft: #fde2e2;
+
+  /* Sombra / raios */
+  --shadow-sm: 0 1px 2px rgba(15, 23, 41, 0.06);
+  --shadow: 0 10px 30px rgba(15, 23, 41, 0.08);
+  --radius: 18px;
+  --radius-sm: 12px;
+
+  color-scheme: light;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica,
+    Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variant-numeric: tabular-nums;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}

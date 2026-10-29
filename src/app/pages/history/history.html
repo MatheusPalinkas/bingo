@@ -1,0 +1,73 @@
+<div class="page">
+  <header class="page-head">
+    <div class="head-text">
+      <span class="eyebrow">Painel do sorteio</span>
+      <h1>Histórico de partidas</h1>
+    </div>
+
+    <div class="head-actions">
+      <span class="badge">{{ totalGames() }} partidas registradas</span>
+      <a class="btn btn-primary" routerLink="/">Voltar ao painel</a>
+    </div>
+  </header>
+
+  @if (!games().length) {
+    <div class="card empty-card">
+      <h2>Nenhuma partida ainda</h2>
+      <p>Comece um novo jogo no painel e as partidas aparecerão aqui.</p>
+      <a class="btn btn-primary" routerLink="/">Ir para o painel</a>
+    </div>
+  } @else {
+    <div class="list">
+      @for (game of games(); track game.id) {
+        <article class="card game" [class.is-open]="isExpanded(game.id)">
+          <button type="button" class="game-head" (click)="toggleExpand(game.id)">
+            <span
+              class="status"
+              [class.status-live]="game.status === 'em-andamento'"
+            >
+              {{ statusLabel(game) }}
+            </span>
+
+            <span class="game-title">
+              <strong>{{ game.name }}</strong>
+              <span class="game-date">{{ formatDate(game.createdAt) }}</span>
+            </span>
+
+            <span class="game-meta">
+              <span class="count">{{ game.drawnNumbers.length }} pedras</span>
+              <span class="chevron" [class.open]="isExpanded(game.id)">⌄</span>
+            </span>
+          </button>
+
+          @if (isExpanded(game.id)) {
+            <div class="game-body">
+              @if (ballsOf(game).length) {
+                <p class="order-label">Pedras na ordem sorteada</p>
+                <div class="order">
+                  @for (ball of ballsOf(game); track $index) {
+                    <span class="order-ball">
+                      <span class="order-index">{{ $index + 1 }}</span>
+                      {{ ball.label }}
+                    </span>
+                  }
+                </div>
+              } @else {
+                <p class="empty">Esta partida não teve pedras sorteadas.</p>
+              }
+
+              <div class="body-actions">
+                <button type="button" class="btn btn-primary" (click)="reopen(game)">
+                  Reabrir partida
+                </button>
+                <button type="button" class="btn btn-danger" (click)="remove(game)">
+                  Remover
+                </button>
+              </div>
+            </div>
+          }
+        </article>
+      }
+    </div>
+  }
+</div>

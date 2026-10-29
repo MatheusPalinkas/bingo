@@ -1,0 +1,136 @@
+<div class="page">
+  <header class="page-head">
+    <div class="head-text">
+      <span class="eyebrow">Painel do sorteio</span>
+      <h1>Bingo</h1>
+    </div>
+
+    <div class="head-status">
+      @if (game()) {
+        <span class="badge badge-live"><span class="dot"></span> Sorteio ativo</span>
+      } @else {
+        <span class="badge badge-idle"><span class="dot dot-idle"></span> Sem partida</span>
+      }
+
+      <div class="head-actions">
+        <button type="button" class="btn btn-primary" (click)="newGame()">Novo jogo</button>
+        @if (game()) {
+          <button type="button" class="btn btn-outline" (click)="finishGame()">Finalizar</button>
+        }
+        <a class="btn btn-outline" routerLink="/historico">Histórico</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Linha superior: Últimas pedras | Pedra atual -->
+  <section class="top-row">
+    <div class="card card-last">
+      <div class="card-head">
+        <h2>Últimas pedras</h2>
+        <span class="pill">{{ drawnCount() }} pedras</span>
+      </div>
+
+      @if (lastBalls().length) {
+        <div class="last-balls">
+          @for (ball of lastBalls(); track ball.number) {
+            <div class="last-ball" [class.is-current]="isCurrent(ball.number)">
+              {{ ball.label }}
+            </div>
+          }
+        </div>
+      } @else {
+        <div class="empty-box">
+          <p class="empty">Nenhuma pedra sorteada ainda.</p>
+        </div>
+      }
+    </div>
+
+    <div class="card card-current">
+      <div class="card-head">
+        <h2>Pedra atual</h2>
+        @if (currentBall()) {
+          <span class="pill pill-accent">Sorteada</span>
+        }
+      </div>
+
+      <div class="current-box" [class.is-active]="currentBall()">
+        @if (currentBall()) {
+          <span class="current-label">Última pedra sorteada</span>
+          <div class="current-number">{{ currentBall()!.label }}</div>
+          <span class="current-sub">Pronta para ser anunciada</span>
+        } @else {
+          <span class="current-label">Aguardando</span>
+          <div class="current-number current-empty">—</div>
+          <span class="current-sub">Clique numa pedra do painel</span>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Painel BINGO (largura total) -->
+  <section class="card panel">
+    <div class="card-head">
+      <h2>Painel B I N G O</h2>
+      <div class="panel-tools">
+        <button
+          type="button"
+          class="toggle"
+          [class.is-on]="horizontal()"
+          (click)="toggleOrientation()"
+        >
+          {{ horizontal() ? 'Letras no topo' : 'Letras na lateral' }}
+        </button>
+        <span class="pill">{{ drawnCount() }} de 75 sorteadas</span>
+      </div>
+    </div>
+
+    @if (!horizontal()) {
+      <!-- Layout vertical: letras no topo -->
+      <div class="grid">
+        <div class="grid-head">
+          @for (letter of letters; track letter) {
+            <div class="head-cell">{{ letter }}</div>
+          }
+        </div>
+
+        @for (row of rows(); track $index) {
+          <div class="grid-row">
+            @for (ball of row; track ball.number) {
+              <button
+                type="button"
+                class="ball"
+                [class.is-drawn]="isDrawn(ball.number)"
+                [class.is-current]="isCurrent(ball.number)"
+                (click)="onBallClick(ball)"
+              >
+                {{ ball.label }}
+              </button>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <!-- Layout horizontal: letras na lateral esquerda -->
+      <div class="grid-h">
+        @for (line of lines(); track line.letter) {
+          <div class="grid-h-row">
+            <div class="side-cell">{{ line.letter }}</div>
+            <div class="grid-h-balls">
+              @for (ball of line.balls; track ball.number) {
+                <button
+                  type="button"
+                  class="ball"
+                  [class.is-drawn]="isDrawn(ball.number)"
+                  [class.is-current]="isCurrent(ball.number)"
+                  (click)="onBallClick(ball)"
+                >
+                  {{ ball.label }}
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+  </section>
+</div>
