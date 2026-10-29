@@ -10,11 +10,11 @@ import { RouterLink } from '@angular/router';
 })
 export class Download {
   /**
-   * URL do instalador resolvida a partir do <base href> do documento,
-   * garantindo o caminho correto tanto local quanto no GitHub Pages
-   * (/bingo/downloads/...). O arquivo é publicado pelo workflow de deploy.
+   * URL do instalador resolvida a partir do <base href> do documento.
+   * O arquivo fica em `public/Bingo-Setup.exe`, que o Angular copia para a
+   * raiz do site no build (ex.: /bingo/Bingo-Setup.exe no GitHub Pages).
    */
-  readonly installerUrl = this.resolveFromBase('downloads/Bingo-Setup.exe');
+  readonly installerUrl = this.resolveFromBase('Bingo-Setup.exe');
 
   private resolveFromBase(relative: string): string {
     if (typeof document === 'undefined') return relative;

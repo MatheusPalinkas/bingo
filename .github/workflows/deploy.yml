@@ -1,3 +1,4 @@
+
 name: Deploy Angular to GitHub Pages
 
 on:
@@ -12,52 +13,7 @@ permissions:
   id-token: write
 
 jobs:
-  # 1) Gera o executável do Electron no Windows e publica como artefato.
-  build-windows:
-    runs-on: windows-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-
-      # Usamos `npm install` (e não `npm ci`) para tolerar divergências do
-      # package-lock.json, já que o sharp traz binários específicos por SO.
-      - name: Install dependencies
-        run: npm install --no-audit --no-fund
-
-      # Libs usadas apenas para gerar os ícones, instaladas sob demanda.
-      - name: Install icon tooling
-        run: npm install --no-save --no-audit --no-fund sharp@^0.33.5 png-to-ico@^2.1.8
-
-      - name: Generate app icons
-        run: npm run icons
-
-      - name: Build Electron installer (Windows)
-        run: npm run electron:build
-
-      - name: Rename installer to a stable name
-        shell: pwsh
-        run: |
-          $exe = Get-ChildItem release -Filter 'Bingo-Setup-*.exe' | Select-Object -First 1
-          if (-not $exe) { throw 'Instalador não encontrado em release/' }
-          New-Item -ItemType Directory -Force -Path artifact | Out-Null
-          Copy-Item $exe.FullName 'artifact/Bingo-Setup.exe'
-
-      - name: Upload installer artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: windows-installer
-          path: artifact/Bingo-Setup.exe
-
-  # 2) Builda o site Angular, embute o instalador em /downloads e publica no Pages.
   deploy:
-    needs: build-windows
     runs-on: ubuntu-latest
 
     environment:
@@ -75,24 +31,10 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        run: npm ci
 
       - name: Build Angular
         run: npm run build -- --base-href="/bingo/"
-
-      - name: Download Windows installer
-        uses: actions/download-artifact@v4
-        with:
-          name: windows-installer
-          path: installer
-
-      - name: Place installer into the site (/downloads)
-        run: |
-          mkdir -p dist/app-bingo/browser/downloads
-          cp installer/Bingo-Setup.exe dist/app-bingo/browser/downloads/Bingo-Setup.exe
-
-      - name: Add SPA fallback (404.html)
-        run: cp dist/app-bingo/browser/index.html dist/app-bingo/browser/404.html
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
