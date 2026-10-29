@@ -26,8 +26,14 @@ jobs:
           node-version: 22
           cache: npm
 
+      # Usamos `npm install` (e não `npm ci`) para tolerar divergências do
+      # package-lock.json, já que o sharp traz binários específicos por SO.
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
+
+      # Libs usadas apenas para gerar os ícones, instaladas sob demanda.
+      - name: Install icon tooling
+        run: npm install --no-save --no-audit --no-fund sharp@^0.33.5 png-to-ico@^2.1.8
 
       - name: Generate app icons
         run: npm run icons
@@ -69,7 +75,7 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Build Angular
         run: npm run build -- --base-href="/bingo/"
