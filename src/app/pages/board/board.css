@@ -100,12 +100,68 @@ h2 {
   }
 }
 
-/* Linha superior -------------------------------------------------------- */
-.top-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+/* Dica de uso ----------------------------------------------------------- */
+.board-hint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0.25rem;
+}
+
+/* Fluxo de cards reordenáveis ------------------------------------------- */
+.board-flow {
+  display: flex;
+  flex-wrap: wrap;
   gap: clamp(1rem, 2.2vw, 1.75rem);
-  align-items: stretch;
+  align-items: flex-start;
+}
+
+/* Cada card ocupa uma faixa; o painel é mais largo por padrão. */
+.board-flow > .card-last,
+.board-flow > .card-current {
+  flex: 1 1 320px;
+  min-width: 280px;
+}
+
+.board-flow > .panel-anchor {
+  flex: 2 1 100%;
+  min-width: 320px;
+}
+
+/* Redimensionamento */
+.resizable {
+  resize: both;
+  overflow: auto;
+}
+
+.resizable.card-last,
+.resizable.card-current {
+  min-height: 12rem;
+}
+
+/* Alça de arraste */
+.drag-handle {
+  cursor: grab;
+  user-select: none;
+  font-size: 1.2rem;
+  line-height: 1;
+  color: var(--text-soft);
+  padding: 0 0.35rem 0 0;
+  margin-right: 0.15rem;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.dragging {
+  opacity: 0.55;
+  outline: 2px dashed var(--primary);
+  outline-offset: 3px;
 }
 
 /* Cards ----------------------------------------------------------------- */
@@ -122,9 +178,12 @@ h2 {
 .card-head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
+  gap: 0.75rem;
   margin-bottom: 1.1rem;
+}
+
+.card-head h2 {
+  margin-right: auto;
 }
 
 .pill {
@@ -142,6 +201,33 @@ h2 {
   color: var(--accent-text);
   background: var(--accent-soft);
   border-color: transparent;
+}
+
+.panel-anchor {
+  display: block;
+}
+
+.panel-anchor.resizable > .panel {
+  height: 100%;
+}
+
+.panel-placeholder .placeholder-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  text-align: center;
+  padding: clamp(2rem, 6vw, 4rem);
+}
+
+.placeholder-icon {
+  font-size: 2.5rem;
+}
+
+.panel-placeholder p {
+  color: var(--text-muted);
+  margin: 0;
 }
 
 .panel-tools {
@@ -410,8 +496,10 @@ h2 {
 
 /* Responsivo ------------------------------------------------------------ */
 @media (max-width: 760px) {
-  .top-row {
-    grid-template-columns: 1fr;
+  .board-flow > .card-last,
+  .board-flow > .card-current,
+  .board-flow > .panel-anchor {
+    flex: 1 1 100%;
   }
 
   .head-status {

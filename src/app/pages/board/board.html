@@ -22,56 +22,137 @@
     </div>
   </header>
 
-  <!-- Linha superior: Últimas pedras | Pedra atual -->
-  <section class="top-row">
-    <div class="card card-last">
-      <div class="card-head">
-        <h2>Últimas pedras</h2>
-        <span class="pill">{{ drawnCount() }} pedras</span>
-      </div>
+  <div class="board-hint">
+    <span>Arraste os cards pela alça ⠿ para reorganizar. Redimensione pelo canto inferior direito.</span>
+    <button type="button" class="toggle" (click)="resetLayout()">Restaurar layout</button>
+  </div>
 
-      @if (lastBalls().length) {
-        <div class="last-balls">
-          @for (ball of lastBalls(); track ball.number) {
-            <div class="last-ball" [class.is-current]="isCurrent(ball.number)">
-              {{ ball.label }}
+  <!-- Área de cards reordenáveis -->
+  <section class="board-flow">
+    @for (cardId of cardOrder(); track cardId) {
+      @switch (cardId) {
+
+        <!-- Últimas pedras -->
+        @case ('last') {
+          <div
+            class="card card-last resizable"
+            [class.dragging]="isDragging('last')"
+            [style]="styleFor('last')"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop('last', $event)"
+            (mouseup)="onResizeEnd('last', $any($event.currentTarget))"
+          >
+            <div class="card-head">
+              <span
+                class="drag-handle"
+                draggable="true"
+                (dragstart)="onDragStart('last', $event)"
+                title="Arrastar"
+                >⠿</span
+              >
+              <h2>Últimas pedras</h2>
+              <span class="pill">{{ drawnCount() }} pedras</span>
             </div>
-          }
-        </div>
-      } @else {
-        <div class="empty-box">
-          <p class="empty">Nenhuma pedra sorteada ainda.</p>
-        </div>
-      }
-    </div>
 
-    <div class="card card-current">
-      <div class="card-head">
-        <h2>Pedra atual</h2>
-        @if (currentBall()) {
-          <span class="pill pill-accent">Sorteada</span>
+            @if (lastBalls().length) {
+              <div class="last-balls">
+                @for (ball of lastBalls(); track ball.number) {
+                  <div class="last-ball" [class.is-current]="isCurrent(ball.number)">
+                    {{ ball.label }}
+                  </div>
+                }
+              </div>
+            } @else {
+              <div class="empty-box">
+                <p class="empty">Nenhuma pedra sorteada ainda.</p>
+              </div>
+            }
+          </div>
         }
-      </div>
 
-      <div class="current-box" [class.is-active]="currentBall()">
-        @if (currentBall()) {
-          <span class="current-label">Última pedra sorteada</span>
-          <div class="current-number">{{ currentBall()!.label }}</div>
-          <span class="current-sub">Pronta para ser anunciada</span>
-        } @else {
-          <span class="current-label">Aguardando</span>
-          <div class="current-number current-empty">—</div>
-          <span class="current-sub">Clique numa pedra do painel</span>
+        <!-- Pedra atual -->
+        @case ('current') {
+          <div
+            class="card card-current resizable"
+            [class.dragging]="isDragging('current')"
+            [style]="styleFor('current')"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop('current', $event)"
+            (mouseup)="onResizeEnd('current', $any($event.currentTarget))"
+          >
+            <div class="card-head">
+              <span
+                class="drag-handle"
+                draggable="true"
+                (dragstart)="onDragStart('current', $event)"
+                title="Arrastar"
+                >⠿</span
+              >
+              <h2>Pedra atual</h2>
+              @if (currentBall()) {
+                <span class="pill pill-accent">Sorteada</span>
+              }
+            </div>
+
+            <div class="current-box" [class.is-active]="currentBall()">
+              @if (currentBall()) {
+                <span class="current-label">Última pedra sorteada</span>
+                <div class="current-number">{{ currentBall()!.label }}</div>
+                <span class="current-sub">Pronta para ser anunciada</span>
+              } @else {
+                <span class="current-label">Aguardando</span>
+                <div class="current-number current-empty">—</div>
+                <span class="current-sub">Clique numa pedra do painel</span>
+              }
+            </div>
+          </div>
         }
-      </div>
-    </div>
-  </section>
 
-  <!-- Painel BINGO (largura total) -->
-  <section class="card panel">
+        <!-- Painel BINGO -->
+        @case ('panel') {
+          <div
+            class="panel-anchor resizable"
+            #panelAnchor
+            [class.dragging]="isDragging('panel')"
+            [style]="styleFor('panel')"
+            (dragover)="onDragOver($event)"
+            (drop)="onDrop('panel', $event)"
+            (mouseup)="onResizeEnd('panel', $any($event.currentTarget))"
+          >
+            @if (poppedOut()) {
+              <section class="card panel panel-placeholder">
+                <div class="placeholder-box">
+                  <span class="placeholder-icon">🪟</span>
+                  <h2>Painel destacado</h2>
+                  <p>O painel BINGO está aberto em outra janela.</p>
+                  <button type="button" class="btn btn-primary" (click)="closePopOut()">
+                    Trazer de volta
+                  </button>
+                </div>
+              </section>
+            }
+
+            <section class="card panel" #panelContent>
     <div class="card-head">
+      <span
+        class="drag-handle"
+        draggable="true"
+        (dragstart)="onDragStart('panel', $event)"
+        title="Arrastar"
+        >⠿</span
+      >
       <h2>Painel B I N G O</h2>
       <div class="panel-tools">
+        @if (canPopOut) {
+          <button
+            type="button"
+            class="toggle"
+            [class.is-on]="poppedOut()"
+            (click)="popOutPanel()"
+          >
+            {{ poppedOut() ? 'Trazer de volta' : 'Destacar janela' }}
+          </button>
+        }
         <button
           type="button"
           class="toggle"
@@ -131,6 +212,11 @@
           </div>
         }
       </div>
+    }
+            </section>
+          </div>
+        }
+      }
     }
   </section>
 </div>

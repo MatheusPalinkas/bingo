@@ -68,3 +68,16 @@ button {
   font-family: inherit;
   cursor: pointer;
 }
+
+/* Janela flutuante (Document Picture-in-Picture) ------------------------- */
+.pip-body {
+  margin: 0;
+  padding: 1rem;
+  background: var(--bg);
+}
+
+.pip-body .panel {
+  margin: 0;
+  height: calc(100vh - 2rem);
+  overflow: auto;
+}
